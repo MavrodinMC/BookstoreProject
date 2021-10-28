@@ -13,7 +13,7 @@ import java.util.List;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/bookstore/users")
+@RequestMapping("/backend/bookstore/users")
 public class AppUserController {
 
     private final AppUserService appUserService;

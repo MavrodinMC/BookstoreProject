@@ -26,8 +26,8 @@ public class AppUser {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-    private Boolean locked;
-    private Boolean enabled;
+    private Boolean locked = true;
+    private Boolean enabled = false;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(

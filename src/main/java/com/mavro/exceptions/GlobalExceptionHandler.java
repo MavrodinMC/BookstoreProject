@@ -25,4 +25,22 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>("The mail is invalid, check the format and try again", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(ConfirmationTokenNotFoundException.class)
+    public ResponseEntity<String> handleConfirmationTokenNotFoundException(ConfirmationTokenNotFoundException confirmationTokenNotFoundException) {
+
+        return new ResponseEntity<>("The requested confirmation token was not found!", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ConfirmationTokenHasExpiredException.class)
+    public ResponseEntity<String> handleExpiredConfirmationToken(ConfirmationTokenHasExpiredException confirmationTokenHasExpiredException) {
+
+        return new ResponseEntity<>("The confirmation token has expired. A new token was issued to your email address, please click the link to confirm your account.", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ConfirmationTokenAlreadyConfirmedException.class)
+    public ResponseEntity<String> handleConfirmationTokenAlreadyConfirmed(ConfirmationTokenAlreadyConfirmedException confirmationTokenAlreadyConfirmedException) {
+
+        return new ResponseEntity<>("The confirmation token was already used.", HttpStatus.BAD_REQUEST);
+    }
 }
