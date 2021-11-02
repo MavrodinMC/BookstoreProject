@@ -43,4 +43,11 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>("The confirmation token was already used.", HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(FailedToSendEmailException.class)
+    public ResponseEntity<String> handleFailedToSendEmail(FailedToSendEmailException failedToSendEmailException) {
+
+        return new ResponseEntity<>("Failed to send email to " , HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }
