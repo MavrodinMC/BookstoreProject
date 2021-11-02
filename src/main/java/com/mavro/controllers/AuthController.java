@@ -22,8 +22,8 @@ public class AuthController {
         return new ResponseEntity<>("You have successfully registered to our bookstore! Please check your email for the activation link in order to have full access to all of our site and your account features! Thank you!", HttpStatus.CREATED);
     }
 
-    @GetMapping("/accountVerification/{token}")
-    public ResponseEntity<String> verifyAccount(@PathVariable String token) {
+    @GetMapping("/accountConfirmation")
+    public ResponseEntity<String> verifyAccount(@RequestParam("token") String token) {
         authService.confirmAccount(token);
         return new ResponseEntity<>("Account activated successfully.", HttpStatus.OK);
     }
