@@ -21,9 +21,10 @@ public class AppUser {
     @Column(name = "user_id")
     private Integer id;
 
+    @Column(name = "username", nullable = false)
+    private String username;
     private String email;
     private String password;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
     private Boolean locked = true;
@@ -37,7 +38,8 @@ public class AppUser {
     )
     private Set<Role> roles = new HashSet<>();
 
-    public AppUser(String email, String password, LocalDateTime createdAt, Boolean locked, Boolean enabled) {
+    public AppUser(String username, String email, String password, LocalDateTime createdAt, Boolean locked, Boolean enabled) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
@@ -49,11 +51,13 @@ public class AppUser {
     public String toString() {
         return "AppUser{" +
                 "id=" + id +
+                ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", createdAt=" + createdAt +
                 ", locked=" + locked +
                 ", enabled=" + enabled +
+                ", roles=" + roles +
                 '}';
     }
 }

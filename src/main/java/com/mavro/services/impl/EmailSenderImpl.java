@@ -47,4 +47,30 @@ public class EmailSenderImpl implements EmailSender {
          }
     }
 
+    @Override
+    public void sendResetPasswordLinkToEmail(String to, String email) {
+
+        try {
+
+            JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+            mailSender.setHost(emailConfig.getHost());
+            mailSender.setPort(emailConfig.getPort());
+            mailSender.setUsername(emailConfig.getUsername());
+            mailSender.setPassword(emailConfig.getPassword());
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "utf-8");
+
+            helper.setText(email, true);
+            helper.setTo(to);
+            helper.setSubject("Password reset");
+            helper.setFrom("noreply@bookstore.ro");
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            log.error("Failed to send email");
+            throw new FailedToSendEmailException(to);
+        }
+    }
+
 }

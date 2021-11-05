@@ -1,13 +1,12 @@
 package com.mavro.services;
 
-import com.mavro.dto.RegistrationRequest;
+import com.mavro.dto.ForgotPasswordDto;
 import com.mavro.entities.AppUser;
-import com.mavro.entities.ConfirmationToken;
+import com.mavro.entities.ForgotPasswordToken;
 import com.mavro.exceptions.*;
 import com.mavro.interfaces.EmailSender;
 import com.mavro.repositories.AppUserRepository;
-import com.mavro.repositories.ConfirmationTokenRepository;
-import com.mavro.repositories.RoleRepository;
+import com.mavro.repositories.ForgotPasswordTokenRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,100 +15,83 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 @AllArgsConstructor
 @Slf4j
 @Service
-public class AuthService {
+public class ForgotPasswordService {
 
-    private final EmailValidatorService emailValidatorService;
+    private final ForgotPasswordTokenRepository forgotPasswordTokenRepository;
     private final AppUserRepository appUserRepository;
-    private final RoleRepository roleRepository;
-    private final ConfirmationTokenRepository confirmationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
 
+    public void generateResetPasswordToken(String email) {
 
-    public void registerUser(RegistrationRequest registrationRequest) {
-
-        if (!checkForInvalidOrEmptyInput(registrationRequest)) {
+        if (email.isEmpty() || email.isBlank()) {
             throw new EmptyInputException();
         }
 
-        boolean isEmailValid = emailValidatorService.test(registrationRequest.getEmail());
+        AppUser appUser = appUserRepository.findAppUserByEmail(email)
+                .orElseThrow(EmailNotFoundException::new);
 
-        if (!isEmailValid) {
-            throw new InvalidEmailException();
+        String resetToken = UUID.randomUUID().toString();
+        ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken();
+        forgotPasswordToken.setResetToken(resetToken);
+        forgotPasswordToken.setRequestedAt(LocalDateTime.now());
+        forgotPasswordToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+        forgotPasswordToken.setAppUser(appUser);
+
+        forgotPasswordTokenRepository.save(forgotPasswordToken);
+
+        String link = "http://localhost:8080/bookstore/generateReset?resetToken=" + resetToken;
+        emailSender.sendResetPasswordLinkToEmail(appUser.getEmail(), buildEmail(appUser.getUsername(), link));
+
+    }
+
+    public void confirmNewPasswordReset(String resetToken, ForgotPasswordDto forgotPasswordDto) {
+
+        if (!checkForInvalidOrEmptyInput(forgotPasswordDto)) {
+            throw new EmptyInputException();
         }
 
-        AppUser user = new AppUser();
-
-        user.setUsername(registrationRequest.getUsername());
-        user.setEmail(registrationRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
-        user.setRoles(Set.of(roleRepository.findRoleByName("USER")));
-        user.setCreatedAt(LocalDateTime.now());
-
-        appUserRepository.save(user);
-
-        generateConfirmationToken(user);
+        Optional<ForgotPasswordToken> forgotPasswordToken = forgotPasswordTokenRepository.findByResetToken(resetToken);
+        forgotPasswordToken.orElseThrow(ResetPasswordTokenNotFoundException::new);
+        fetchUser(forgotPasswordToken.get(), forgotPasswordDto);
 
     }
 
-    public void generateConfirmationToken(AppUser appUser) {
-
-        String token = UUID.randomUUID().toString();
-        ConfirmationToken confirmationToken = new ConfirmationToken();
-        confirmationToken.setToken(token);
-        confirmationToken.setCreatedAt(LocalDateTime.now());
-        confirmationToken.setExpiresAt(LocalDateTime.now().plusMinutes(15));
-        confirmationToken.setAppUser(appUser);
-
-        confirmationTokenRepository.save(confirmationToken);
-
-        String link = "http://localhost:8080/bookstore/accountConfirmation?token=" + token;
-        emailSender.sendConfirmationLinkToEmail(appUser.getEmail(), buildEmail(appUser.getUsername(), link));
-
-    }
-
-    public void confirmAccount(String token) {
-
-        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findByToken(token);
-        confirmationToken.orElseThrow(ConfirmationTokenNotFoundException::new);
-        fetchUserAndEnable(confirmationToken.get());
-
-    }
 
     @Transactional
-    private void fetchUserAndEnable(ConfirmationToken confirmationToken) {
+    private void fetchUser(ForgotPasswordToken forgotPasswordToken, ForgotPasswordDto forgotPasswordDto) {
 
-        String email = confirmationToken.getAppUser().getEmail();
+        String email = forgotPasswordToken.getAppUser().getEmail();
         AppUser user = appUserRepository.findAppUserByEmail(email)
                 .orElseThrow(EmailNotFoundException::new);
 
-        if (confirmationToken.getConfirmedAt() != null) {
-            throw new ConfirmationTokenAlreadyConfirmedException();
+        if (forgotPasswordToken.getUsedAt() != null) {
+            throw new ResetPasswordRequestAlreadyUsedException();
         }
 
-        if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
-            generateConfirmationToken(user);
-            throw new ConfirmationTokenHasExpiredException();
+        if (forgotPasswordToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+            generateResetPasswordToken(user.getEmail());
+            throw new ResetPasswordRequestExpiredException();
         }
 
-        confirmationToken.setConfirmedAt(LocalDateTime.now());
-        user.setLocked(false);
-        user.setEnabled(true);
+        if (!forgotPasswordDto.getNewPassword().equals(forgotPasswordDto.getConfirmNewPassword())) {
+            throw new PasswordsMustMatchException();
+        }
+
+        forgotPasswordToken.setUsedAt(LocalDateTime.now());
+        user.setPassword(passwordEncoder.encode(forgotPasswordDto.getNewPassword()));
         appUserRepository.save(user);
     }
 
-    public boolean checkForInvalidOrEmptyInput(RegistrationRequest registrationRequest) {
+    public boolean checkForInvalidOrEmptyInput(ForgotPasswordDto forgotPasswordDto) {
 
-        return !registrationRequest.getUsername().isEmpty() && !registrationRequest.getUsername().isBlank() && !registrationRequest.getEmail().isEmpty() && !registrationRequest.getPassword().isEmpty()
-                && !registrationRequest.getEmail().isBlank() && !registrationRequest.getPassword().isBlank();
+        return !forgotPasswordDto.getNewPassword().isEmpty() && !forgotPasswordDto.getNewPassword().isBlank() && !forgotPasswordDto.getConfirmNewPassword().isEmpty() && !forgotPasswordDto.getConfirmNewPassword().isBlank();
     }
-
 
     private String buildEmail(String name, String link) {
         return "<div style=\"font-family:Helvetica,Arial,sans-serif;font-size:16px;margin:0;color:#0b0c0c\">\n" +
@@ -129,7 +111,7 @@ public class AuthService {
                 "                  \n" +
                 "                    </td>\n" +
                 "                    <td style=\"font-size:28px;line-height:1.315789474;Margin-top:4px;padding-left:10px\">\n" +
-                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Confirm your email</span>\n" +
+                "                      <span style=\"font-family:Helvetica,Arial,sans-serif;font-weight:700;color:#ffffff;text-decoration:none;vertical-align:top;display:inline-block\">Reset password</span>\n" +
                 "                    </td>\n" +
                 "                  </tr>\n" +
                 "                </tbody></table>\n" +
@@ -167,7 +149,7 @@ public class AuthService {
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
                 "      <td style=\"font-family:Helvetica,Arial,sans-serif;font-size:19px;line-height:1.315789474;max-width:560px\">\n" +
                 "        \n" +
-                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> Thank you for registering. Please click on the below link to activate your account: </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Activate Now</a> </p></blockquote>\n Link will expire in 15 minutes. <p>See you soon</p>" +
+                "            <p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\">Hi " + name + ",</p><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> You requested to change your password. If this was not you, please, ignore this email. If it was you, please follow the link below to reset your password. </p><blockquote style=\"Margin:0 0 20px 0;border-left:10px solid #b1b4b6;padding:15px 0 0.1px 15px;font-size:19px;line-height:25px\"><p style=\"Margin:0 0 20px 0;font-size:19px;line-height:25px;color:#0b0c0c\"> <a href=\"" + link + "\">Reset Password</a> </p></blockquote>\n Link will expire in 30 minutes. <p>See you soon</p>" +
                 "        \n" +
                 "      </td>\n" +
                 "      <td width=\"10\" valign=\"middle\"><br></td>\n" +
@@ -179,6 +161,5 @@ public class AuthService {
                 "\n" +
                 "</div></div>";
     }
-
 
 }
