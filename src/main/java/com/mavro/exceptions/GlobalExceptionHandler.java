@@ -50,4 +50,28 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Failed to send email to " , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(ResetPasswordRequestExpiredException.class)
+    public ResponseEntity<String> handleResetPasswordRequestExpired(ResetPasswordRequestExpiredException resetPasswordRequestExpiredException) {
+
+        return new ResponseEntity<>("The request expired", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResetPasswordRequestAlreadyUsedException.class)
+    public ResponseEntity<String> handleResetPasswordRequestAlreadyUsed(ResetPasswordRequestAlreadyUsedException resetPasswordRequestAlreadyUsedException) {
+
+        return new ResponseEntity<>("This request was already completed", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(ResetPasswordTokenNotFoundException.class)
+    public ResponseEntity<String> handleResetPasswordTokenNotFound(ResetPasswordTokenNotFoundException resetPasswordTokenNotFoundException) {
+
+        return new ResponseEntity<>("The reset token was not found", HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(PasswordsMustMatchException.class)
+    public ResponseEntity<String> handlePasswordsMustMatch(PasswordsMustMatchException passwordsMustMatchException) {
+
+        return new ResponseEntity<>("Passwords must match", HttpStatus.BAD_REQUEST);
+    }
+
 }

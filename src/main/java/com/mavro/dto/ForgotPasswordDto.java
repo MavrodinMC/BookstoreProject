@@ -7,9 +7,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class RegistrationRequest {
+public class ForgotPasswordDto {
 
-    private String username;
-    private String email;
-    private String password;
+    private String newPassword;
+    private String confirmNewPassword;
+
 }

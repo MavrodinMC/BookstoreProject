@@ -28,4 +28,6 @@ public class AuthController {
         return new ResponseEntity<>("Account activated successfully.", HttpStatus.OK);
     }
 
+    // f494f2e8-ecb9-40f6-9176-7ab141bb59f3
+
 }
