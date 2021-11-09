@@ -5,6 +5,7 @@ import com.mavro.dto.LoginRequest;
 import com.mavro.dto.RefreshTokenRequest;
 import com.mavro.dto.RegistrationRequest;
 import com.mavro.services.AuthService;
+import com.mavro.services.RefreshTokenService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody RegistrationRequest registrationRequest) {
@@ -29,6 +31,13 @@ public class AuthController {
     public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
 
         return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+
+        refreshTokenService.deleteRefreshToken(refreshTokenRequest.getRefreshToken());
+        return new ResponseEntity<>("Logout successfull, refresh token deleted", HttpStatus.OK);
     }
 
     @PostMapping("/refresh/token")

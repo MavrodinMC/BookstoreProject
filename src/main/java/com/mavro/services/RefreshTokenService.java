@@ -26,12 +26,12 @@ public class RefreshTokenService {
         return refreshTokenRepository.save(refreshToken);
     }
     
-    void validateRefreshToken(String token) {
+    public void validateRefreshToken(String token) {
         refreshTokenRepository.findByToken(token)
                 .orElseThrow(RefreshTokenNotFoundException::new);
     }
 
-    void deleteRefreshToken(String token) {
+    public void deleteRefreshToken(String token) {
         refreshTokenRepository.deleteByToken(token);
     }
 }
