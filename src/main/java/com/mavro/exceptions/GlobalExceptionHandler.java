@@ -74,4 +74,16 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Passwords must match", HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(KeyException.class)
+    public ResponseEntity<String> handleKeyException(KeyException keyException) {
+
+        return new ResponseEntity<>("Problem while loading keystore...", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<String> handleBadCredentials(BadCredentialsException badCredentialsException) {
+
+        return new ResponseEntity<>("Wrong username or password. Check your credentials and try again", HttpStatus.OK);
+    }
+
 }

@@ -48,6 +48,7 @@ public class EmailSenderImpl implements EmailSender {
     }
 
     @Override
+    @Async
     public void sendResetPasswordLinkToEmail(String to, String email) {
 
         try {

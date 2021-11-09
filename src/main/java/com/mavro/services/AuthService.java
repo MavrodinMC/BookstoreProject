@@ -1,19 +1,29 @@
 package com.mavro.services;
 
+import com.mavro.dto.AuthenticationResponse;
+import com.mavro.dto.LoginRequest;
+import com.mavro.dto.RefreshTokenRequest;
 import com.mavro.dto.RegistrationRequest;
 import com.mavro.entities.AppUser;
 import com.mavro.entities.ConfirmationToken;
 import com.mavro.exceptions.*;
 import com.mavro.interfaces.EmailSender;
+import com.mavro.jwt.JwtProvider;
 import com.mavro.repositories.AppUserRepository;
 import com.mavro.repositories.ConfirmationTokenRepository;
 import com.mavro.repositories.RoleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
@@ -30,11 +40,14 @@ public class AuthService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
+    private final RefreshTokenService refreshTokenService;
+    private final JwtProvider jwtProvider;
+    private final AuthenticationManager authenticationManager;
 
 
     public void registerUser(RegistrationRequest registrationRequest) {
 
-        if (!checkForInvalidOrEmptyInput(registrationRequest)) {
+        if (!checkForInvalidOrEmptyInputOnSignIn(registrationRequest)) {
             throw new EmptyInputException();
         }
 
@@ -55,6 +68,31 @@ public class AuthService {
         appUserRepository.save(user);
 
         generateConfirmationToken(user);
+
+    }
+
+    public AuthenticationResponse login(LoginRequest loginRequest) {
+
+        if (!checkForInvalidOrEmptyInputOnLogin(loginRequest)) {
+            throw new EmptyInputException();
+        }
+
+        try {
+
+            Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+
+            SecurityContextHolder.getContext().setAuthentication(authenticate);
+            String token = jwtProvider.generateToken(authenticate);
+
+            return AuthenticationResponse.builder()
+                    .authenticationToken(token)
+                    .refreshToken(refreshTokenService.generateRefreshToken().getToken())
+                    .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                    .email(loginRequest.getEmail())
+                    .build();
+        } catch (AuthenticationException e) {
+            throw new BadCredentialsException();
+        }
 
     }
 
@@ -104,10 +142,28 @@ public class AuthService {
         appUserRepository.save(user);
     }
 
-    public boolean checkForInvalidOrEmptyInput(RegistrationRequest registrationRequest) {
+    public boolean checkForInvalidOrEmptyInputOnSignIn(RegistrationRequest registrationRequest) {
 
         return !registrationRequest.getUsername().isEmpty() && !registrationRequest.getUsername().isBlank() && !registrationRequest.getEmail().isEmpty() && !registrationRequest.getPassword().isEmpty()
                 && !registrationRequest.getEmail().isBlank() && !registrationRequest.getPassword().isBlank();
+    }
+
+    public boolean checkForInvalidOrEmptyInputOnLogin(LoginRequest loginRequest) {
+
+        return !loginRequest.getEmail().isEmpty() && !loginRequest.getEmail().isBlank() && !loginRequest.getPassword().isEmpty() && !loginRequest.getPassword().isBlank();
+    }
+
+    public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+
+        refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
+        String token = jwtProvider.generateTokenWithUsername(refreshTokenRequest.getEmail());
+
+        return AuthenticationResponse.builder()
+                .authenticationToken(token)
+                .refreshToken(refreshTokenRequest.getRefreshToken())
+                .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
+                .email(refreshTokenRequest.getEmail())
+                .build();
     }
 
 

@@ -1,5 +1,8 @@
 package com.mavro.controllers;
 
+import com.mavro.dto.AuthenticationResponse;
+import com.mavro.dto.LoginRequest;
+import com.mavro.dto.RefreshTokenRequest;
 import com.mavro.dto.RegistrationRequest;
 import com.mavro.services.AuthService;
 import lombok.AllArgsConstructor;
@@ -22,12 +25,24 @@ public class AuthController {
         return new ResponseEntity<>("You have successfully registered to our bookstore! Please check your email for the activation link in order to have full access to all of our site and your account features! Thank you!", HttpStatus.CREATED);
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody LoginRequest loginRequest) {
+
+        return new ResponseEntity<>(authService.login(loginRequest), HttpStatus.OK);
+    }
+
+    @PostMapping("/refresh/token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+
+        return new ResponseEntity<>(authService.refreshToken(refreshTokenRequest), HttpStatus.OK);
+    }
+
     @GetMapping("/accountConfirmation")
     public ResponseEntity<String> verifyAccount(@RequestParam("token") String token) {
         authService.confirmAccount(token);
         return new ResponseEntity<>("Account activated successfully.", HttpStatus.OK);
     }
 
-    // f494f2e8-ecb9-40f6-9176-7ab141bb59f3
+
 
 }

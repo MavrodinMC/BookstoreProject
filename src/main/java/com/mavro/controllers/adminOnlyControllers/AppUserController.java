@@ -1,7 +1,7 @@
-package com.mavro.controllers;
+package com.mavro.controllers.adminOnlyControllers;
 
 import com.mavro.entities.AppUser;
-import com.mavro.services.AppUserService;
+import com.mavro.services.adminOnlyServices.AppUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
