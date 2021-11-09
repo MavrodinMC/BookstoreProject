@@ -1,4 +1,4 @@
-package com.mavro.services;
+package com.mavro.services.adminOnlyServices;
 
 import com.mavro.entities.AppUser;
 import com.mavro.repositories.AppUserRepository;
