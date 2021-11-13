@@ -14,6 +14,7 @@ import com.mavro.repositories.ConfirmationTokenRepository;
 import com.mavro.repositories.RoleRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -164,6 +165,22 @@ public class AuthService {
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .email(refreshTokenRequest.getEmail())
                 .build();
+    }
+
+    @Transactional
+    public AppUser getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+
+        return appUserRepository.findAppUserByEmail(principal.getUsername())
+                .orElseThrow(EmailNotFoundException::new);
+    }
+
+    public boolean isLoggedIn() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 
 
