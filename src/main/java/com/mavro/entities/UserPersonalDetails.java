@@ -1,6 +1,6 @@
 package com.mavro.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -37,7 +37,7 @@ public class UserPersonalDetails {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JsonIgnore
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private AppUser appUser;
 
     public UserPersonalDetails(String favoriteAuthor, String favoriteBook, String favoriteQuote, String aboutYourself, Instant updatedAt) {

@@ -34,6 +34,11 @@ public class UserPersonalDetailsService {
         return userPersonalDetailsRepository.save(userPersonalDetails);
     }
 
+    public UserPersonalDetails getUserPersonalDetails(int id) {
+
+        return userPersonalDetailsRepository.findById(id).get();
+    }
+
     public void updateUserPersonalDetails(int id, UserPersonalDetailsDto userPersonalDetailsDto) {
 
         UserPersonalDetails userPersonalDetails = userPersonalDetailsRepository.getById(id);

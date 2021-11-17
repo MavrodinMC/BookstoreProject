@@ -15,6 +15,12 @@ public class UserPersonalDetailsController {
 
     private final UserPersonalDetailsService userPersonalDetailsService;
 
+    @GetMapping("/user/details/{id}")
+    public ResponseEntity<UserPersonalDetails> getUserPersonalDetails(@PathVariable int id) {
+
+        return new ResponseEntity<>(userPersonalDetailsService.getUserPersonalDetails(id), HttpStatus.OK);
+    }
+
     @PostMapping("/user/details")
     public ResponseEntity<UserPersonalDetails> saveUserPersonalDetails(@RequestParam(name = "email") String email, @RequestBody UserPersonalDetailsDto userPersonalDetailsDto) {
 
