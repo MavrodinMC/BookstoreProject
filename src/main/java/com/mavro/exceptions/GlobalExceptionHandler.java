@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConfirmationTokenHasExpiredException.class)
     public ResponseEntity<String> handleExpiredConfirmationToken(ConfirmationTokenHasExpiredException confirmationTokenHasExpiredException) {
 
-        return new ResponseEntity<>("The confirmation token has expired. A new token was issued to your email address, please click the link to confirm your account.", HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("The confirmation token has expired. A new token was issued to your email address, please click the link to confirm your account.", HttpStatus.GONE);
     }
 
     @ExceptionHandler(ConfirmationTokenAlreadyConfirmedException.class)

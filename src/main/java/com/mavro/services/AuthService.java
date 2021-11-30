@@ -108,7 +108,7 @@ public class AuthService {
 
         confirmationTokenRepository.save(confirmationToken);
 
-        String link = "http://localhost:8080/bookstore/accountConfirmation?token=" + token;
+        String link = "http://localhost:4200/accountConfirmation?token=" + token;
         emailSender.sendConfirmationLinkToEmail(appUser.getEmail(), buildEmail(appUser.getUsername(), link));
 
     }
@@ -128,14 +128,16 @@ public class AuthService {
         AppUser user = appUserRepository.findAppUserByEmail(email)
                 .orElseThrow(EmailNotFoundException::new);
 
-        if (confirmationToken.getConfirmedAt() != null) {
+        if (confirmationToken.getConfirmedAt() != null || confirmationToken.getAppUser().getEnabled()) {
             throw new ConfirmationTokenAlreadyConfirmedException();
         }
 
         if (confirmationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
             generateConfirmationToken(user);
+            confirmationTokenRepository.deleteById(confirmationToken.getId());
             throw new ConfirmationTokenHasExpiredException();
         }
+
 
         confirmationToken.setConfirmedAt(LocalDateTime.now());
         user.setLocked(false);
