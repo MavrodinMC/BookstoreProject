@@ -1,5 +1,6 @@
 package com.mavro.exceptions;
 
+import com.mavro.dto.AuthenticationResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -81,9 +82,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<String> handleBadCredentials(BadCredentialsException badCredentialsException) {
-
-        return new ResponseEntity<>("Wrong username or password. Check your credentials and try again", HttpStatus.OK);
+    public ResponseEntity<AuthenticationResponse> handleBadCredentials(BadCredentialsException badCredentialsException) {
+        AuthenticationResponse authenticationResponse = new AuthenticationResponse();
+        authenticationResponse.setAuthenticationToken(null);
+        return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 
 }
