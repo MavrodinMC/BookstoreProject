@@ -34,7 +34,7 @@ public class ForgotPasswordService {
         }
 
         AppUser appUser = appUserRepository.findAppUserByEmail(email)
-                .orElseThrow(EmailNotFoundException::new);
+                .orElseThrow(NoEmailFoundForAccountException::new);
 
         String resetToken = UUID.randomUUID().toString();
         ForgotPasswordToken forgotPasswordToken = new ForgotPasswordToken();
@@ -45,9 +45,21 @@ public class ForgotPasswordService {
 
         forgotPasswordTokenRepository.save(forgotPasswordToken);
 
-        String link = "http://localhost:8080/bookstore/generateReset?resetToken=" + resetToken;
+        String link = "http://localhost:4200/forgot-password-reset?resetToken=" + resetToken;
         emailSender.sendResetPasswordLinkToEmail(appUser.getEmail(), buildEmail(appUser.getUsername(), link));
 
+    }
+
+    public ForgotPasswordToken captureResetToken(String resetToken) {
+        
+        ForgotPasswordToken forgotPasswordToken = forgotPasswordTokenRepository.findByResetToken(resetToken)
+                .orElseThrow(ResetPasswordTokenNotFoundException::new);
+
+        if (forgotPasswordToken.getUsedAt() != null) {
+            throw new ResetPasswordRequestAlreadyUsedException();
+        }
+
+        return forgotPasswordToken;
     }
 
     public void confirmNewPasswordReset(String resetToken, ForgotPasswordDto forgotPasswordDto) {

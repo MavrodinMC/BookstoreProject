@@ -51,6 +51,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Failed to send email to " , HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+    @ExceptionHandler(NoEmailFoundForAccountException.class)
+    public ResponseEntity<String> handleNoEmailFoundForAccount(NoEmailFoundForAccountException noEmailFoundForAccountException) {
+        return new ResponseEntity<>(null, HttpStatus.OK);
+    }
+
     @ExceptionHandler(ResetPasswordRequestExpiredException.class)
     public ResponseEntity<String> handleResetPasswordRequestExpired(ResetPasswordRequestExpiredException resetPasswordRequestExpiredException) {
 
