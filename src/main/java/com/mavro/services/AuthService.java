@@ -6,12 +6,14 @@ import com.mavro.dto.RefreshTokenRequest;
 import com.mavro.dto.RegistrationRequest;
 import com.mavro.entities.AppUser;
 import com.mavro.entities.ConfirmationToken;
+import com.mavro.entities.UserPersonalDetails;
 import com.mavro.exceptions.*;
 import com.mavro.interfaces.EmailSender;
 import com.mavro.jwt.JwtProvider;
 import com.mavro.repositories.AppUserRepository;
 import com.mavro.repositories.ConfirmationTokenRepository;
 import com.mavro.repositories.RoleRepository;
+import com.mavro.repositories.UserPersonalDetailsRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -39,6 +41,7 @@ public class AuthService {
     private final AppUserRepository appUserRepository;
     private final RoleRepository roleRepository;
     private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final UserPersonalDetailsRepository userPersonalDetailsRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailSender emailSender;
     private final RefreshTokenService refreshTokenService;
@@ -66,7 +69,12 @@ public class AuthService {
         user.setRoles(Set.of(roleRepository.findRoleByName("USER")));
         user.setCreatedAt(LocalDateTime.now());
 
+        UserPersonalDetails userPersonalDetails = new UserPersonalDetails();
+
         appUserRepository.save(user);
+
+        userPersonalDetails.setAppUser(user);
+        userPersonalDetailsRepository.save(userPersonalDetails);
 
         generateConfirmationToken(user);
 

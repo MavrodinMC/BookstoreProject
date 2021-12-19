@@ -10,21 +10,16 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin("http://localhost:4200")
 @RequestMapping("/bookstore")
 public class UserPersonalDetailsController {
 
     private final UserPersonalDetailsService userPersonalDetailsService;
 
-    @GetMapping("/user/details/{id}")
-    public ResponseEntity<UserPersonalDetails> getUserPersonalDetails(@PathVariable int id) {
+    @GetMapping("/user/details/{email}")
+    public ResponseEntity<UserPersonalDetails> getUserPersonalDetails(@PathVariable String email) {
 
-        return new ResponseEntity<>(userPersonalDetailsService.getUserPersonalDetails(id), HttpStatus.OK);
-    }
-
-    @PostMapping("/user/details")
-    public ResponseEntity<UserPersonalDetails> saveUserPersonalDetails(@RequestParam(name = "email") String email, @RequestBody UserPersonalDetailsDto userPersonalDetailsDto) {
-
-        return new ResponseEntity<>(userPersonalDetailsService.saveUserPersonalDetails(email, userPersonalDetailsDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(userPersonalDetailsService.getUserPersonalDetails(email), HttpStatus.OK);
     }
 
     @PutMapping("/user/update/details/{id}")
