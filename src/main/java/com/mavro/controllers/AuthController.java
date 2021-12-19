@@ -41,9 +41,9 @@ public class AuthController {
     }
 
     @PostMapping("/refresh/token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public AuthenticationResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
 
-        return new ResponseEntity<>(authService.refreshToken(refreshTokenRequest), HttpStatus.OK);
+        return authService.refreshToken(refreshTokenRequest);
     }
 
     @GetMapping("/accountConfirmation")

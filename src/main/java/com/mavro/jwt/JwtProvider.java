@@ -91,7 +91,7 @@ public class JwtProvider {
             parserBuilder().setSigningKey(getPublicKey()).build().parseClaimsJws(jwt);
             return true;
         } catch (ExpiredJwtException e) {
-            System.out.println("The token has expired");
+            e.getMessage();
         }
 
         return false;

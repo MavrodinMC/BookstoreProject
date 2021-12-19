@@ -39,14 +39,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
+        http.cors();
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/bookstore/**").permitAll()
-                .anyRequest().hasAuthority("ADMIN");
+                .antMatchers("/bookstore/login", "/bookstore/register", "/bookstore/logout", "/bookstore/accountConfirmation", "/bookstore/refresh/token").permitAll()
+                .anyRequest().authenticated();
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
 
 }

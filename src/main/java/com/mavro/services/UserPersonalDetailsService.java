@@ -18,25 +18,12 @@ public class UserPersonalDetailsService {
     private final UserPersonalDetailsRepository userPersonalDetailsRepository;
     private final AppUserRepository appUserRepository;
 
-    public UserPersonalDetails saveUserPersonalDetails(String email, UserPersonalDetailsDto userPersonalDetailsDto) {
+    public UserPersonalDetails getUserPersonalDetails(String email) {
 
         AppUser appUser = appUserRepository.findAppUserByEmail(email)
                 .orElseThrow(EmailNotFoundException::new);
 
-        UserPersonalDetails userPersonalDetails = new UserPersonalDetails();
-        userPersonalDetails.setFavoriteAuthor(userPersonalDetailsDto.getFavoriteAuthor());
-        userPersonalDetails.setFavoriteBook(userPersonalDetailsDto.getFavoriteBook());
-        userPersonalDetails.setFavoriteQuote(userPersonalDetailsDto.getFavoriteQuote());
-        userPersonalDetails.setAboutYourself(userPersonalDetailsDto.getAboutYourself());
-        userPersonalDetails.setUpdatedAt(userPersonalDetailsDto.getUpdatedAt());
-        userPersonalDetails.setAppUser(appUser);
-
-        return userPersonalDetailsRepository.save(userPersonalDetails);
-    }
-
-    public UserPersonalDetails getUserPersonalDetails(int id) {
-
-        return userPersonalDetailsRepository.findById(id).get();
+        return userPersonalDetailsRepository.findById(appUser.getId()).get();
     }
 
     public void updateUserPersonalDetails(int id, UserPersonalDetailsDto userPersonalDetailsDto) {
