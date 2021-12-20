@@ -40,6 +40,14 @@ public class AppUser {
     )
     private Set<Role> roles = new HashSet<>();
 
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "users_addresses",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id")
+    )
+    private Set<ShippingAddress> shippingAddresses = new HashSet<>();
+
     public AppUser(String username, String email, String password, LocalDateTime createdAt, Boolean locked, Boolean enabled) {
         this.username = username;
         this.email = email;
@@ -47,6 +55,16 @@ public class AppUser {
         this.createdAt = createdAt;
         this.locked = locked;
         this.enabled = enabled;
+    }
+
+    public void addAddress(ShippingAddress shippingAddress) {
+        shippingAddresses.add(shippingAddress);
+        shippingAddress.getAppUsers().add(this);
+    }
+
+    public void removeAddress(ShippingAddress shippingAddress) {
+        shippingAddresses.remove(shippingAddress);
+        shippingAddress.getAppUsers().remove(this);
     }
 
     @Override

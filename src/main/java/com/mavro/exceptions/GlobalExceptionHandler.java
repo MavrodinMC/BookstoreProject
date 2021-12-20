@@ -93,4 +93,10 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(authenticationResponse, HttpStatus.OK);
     }
 
+    @ExceptionHandler(ShippingAddressNotFoundException.class)
+    public ResponseEntity<String> handleShippingAddressNotFoundException(ShippingAddressNotFoundException shippingAddressNotFoundException) {
+
+        return new ResponseEntity<>("Address not found", HttpStatus.NOT_FOUND);
+    }
+
 }
