@@ -1,0 +1,39 @@
+package com.mavro.controllers;
+
+import com.mavro.dto.ShippingAddressDto;
+import com.mavro.entities.ShippingAddress;
+import com.mavro.services.ShippingAddressService;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@AllArgsConstructor
+@RestController
+@RequestMapping("/bookstore")
+public class ShippingAddressController {
+
+    private final ShippingAddressService shippingAddressService;
+
+    @GetMapping("/shippingAddresses/{email}")
+    public ResponseEntity<List<ShippingAddress>> getAllAddressesForAUser(@PathVariable(name = "email") String email) {
+
+        return new ResponseEntity<>(shippingAddressService.getAllAddressesForAUser(email), HttpStatus.OK);
+    }
+
+    @PostMapping("/save/shippingAddresses/{email}")
+    public ResponseEntity<?> saveAnAddressForAUser(@PathVariable(name = "email") String email, @RequestBody ShippingAddressDto shippingAddressDto) {
+
+        shippingAddressService.saveAddressForAUser(email, shippingAddressDto);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{shippingAddressId}/{email}")
+    public ResponseEntity<?> deleteAnAddressForAUser(@PathVariable(name = "shippingAddressId") int shippingAddressId, @PathVariable(name = "email") String email) {
+
+        shippingAddressService.deleteAnAddressesForAUser(shippingAddressId, email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+}

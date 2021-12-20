@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @RestController
-@CrossOrigin("http://localhost:4200")
 @RequestMapping("/bookstore")
 public class UserPersonalDetailsController {
 
