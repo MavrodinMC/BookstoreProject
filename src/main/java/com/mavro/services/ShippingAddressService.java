@@ -42,7 +42,7 @@ public class ShippingAddressService {
         shippingAddress.setCity(shippingAddressDto.getCity());
         shippingAddress.setState(shippingAddressDto.getState());
         shippingAddress.setZipCode(shippingAddressDto.getZipCode());
-        shippingAddress.setIsDefault(false);
+        shippingAddress.setIsDefault(shippingAddressDto.isDefault());
 
         shippingAddressRepository.save(shippingAddress);
 

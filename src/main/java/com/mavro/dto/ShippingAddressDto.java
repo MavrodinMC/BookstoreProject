@@ -17,4 +17,5 @@ public class ShippingAddressDto {
     private String phoneNumber;
     private String state;
     private String zipCode;
+    private boolean isDefault;
 }

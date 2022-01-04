@@ -17,13 +17,13 @@ public class ShippingAddressController {
 
     private final ShippingAddressService shippingAddressService;
 
-    @GetMapping("/shippingAddresses/{email}")
+    @GetMapping("/shippingAddress/{email}")
     public ResponseEntity<List<ShippingAddress>> getAllAddressesForAUser(@PathVariable(name = "email") String email) {
 
         return new ResponseEntity<>(shippingAddressService.getAllAddressesForAUser(email), HttpStatus.OK);
     }
 
-    @PostMapping("/save/shippingAddresses/{email}")
+    @PostMapping("/save/shippingAddress/{email}")
     public ResponseEntity<?> saveAnAddressForAUser(@PathVariable(name = "email") String email, @RequestBody ShippingAddressDto shippingAddressDto) {
 
         shippingAddressService.saveAddressForAUser(email, shippingAddressDto);
