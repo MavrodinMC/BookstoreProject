@@ -30,10 +30,17 @@ public class ShippingAddressController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{shippingAddressId}/{email}")
+    @PutMapping("/shippingAddress/update")
+    public ResponseEntity<?> updateAnAddressForAUser(@RequestBody ShippingAddress shippingAddress) {
+
+        shippingAddressService.updateAnAddressForAUser(shippingAddress);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/shippingAddress/delete/{shippingAddressId}/{email}")
     public ResponseEntity<?> deleteAnAddressForAUser(@PathVariable(name = "shippingAddressId") int shippingAddressId, @PathVariable(name = "email") String email) {
 
-        shippingAddressService.deleteAnAddressesForAUser(shippingAddressId, email);
+        shippingAddressService.deleteAnAddressForAUser(shippingAddressId, email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
