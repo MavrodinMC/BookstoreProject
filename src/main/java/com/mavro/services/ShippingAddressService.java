@@ -52,7 +52,12 @@ public class ShippingAddressService {
         appUserRepository.save(appUser);
    }
 
-   public void deleteAnAddressesForAUser(int shippingAddressId, String email) {
+   public void updateAnAddressForAUser(ShippingAddress shippingAddress) {
+
+        shippingAddressRepository.save(shippingAddress);
+   }
+
+   public void deleteAnAddressForAUser(int shippingAddressId, String email) {
 
         AppUser appUser = appUserRepository.findAppUserByEmail(email)
                 .orElseThrow(EmailNotFoundException::new);
