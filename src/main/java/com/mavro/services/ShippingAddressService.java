@@ -44,6 +44,15 @@ public class ShippingAddressService {
         shippingAddress.setZipCode(shippingAddressDto.getZipCode());
         shippingAddress.setIsDefault(shippingAddressDto.isDefault());
 
+        if (shippingAddressDto.isDefault()) {
+
+            List<ShippingAddress> addressList = new ArrayList<>(shippingAddressRepository.findAll());
+
+            for (ShippingAddress address : addressList) {
+                address.setIsDefault(false);
+            }
+        }
+
         shippingAddressRepository.save(shippingAddress);
 
 
@@ -53,6 +62,17 @@ public class ShippingAddressService {
    }
 
    public void updateAnAddressForAUser(ShippingAddress shippingAddress) {
+
+           if (shippingAddress.getIsDefault()) {
+
+             List<ShippingAddress> addressList = new ArrayList<>(shippingAddressRepository.findAll());
+
+             for (ShippingAddress address: addressList) {
+
+                address.setIsDefault(false);
+             }
+
+            }
 
         shippingAddressRepository.save(shippingAddress);
    }
