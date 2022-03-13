@@ -43,7 +43,7 @@ $ git clone https://github.com/MavrodinMC/BookstoreProjectBackend
 - Open this project using IntelliJ (or any other IDE)
 
 - Run ```BookstoreProject.java```
-  > This is gonna be building the maven dependencies too
+  > This is gonna build the maven dependencies too
 - The endpoints are located in 'http://localhost:8080' and config its port on ```src/main/resources/application.properties```
   > Use a software like Postman to do the requests. 
   
