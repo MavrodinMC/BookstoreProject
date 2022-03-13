@@ -31,7 +31,7 @@ The user can: register, login, retrieve his lost password, update his personal d
 
 # How to use (if you plan to use it locally)
 
-To clone and run this application by yourself, make sure you have at least Java 11 and all JDK stuff (including JRE), Maven to build the dependencies,
+To clone and run this application by yourself, make sure you have at least Java 11 and all JDK stuff (including JRE) installed on your machine, Maven to build the dependencies,
 IntelliJ IDEA (which I recommend), and Postman (it's not necessary, though it's really useful to handle the rest API. After that, do the following instructions: 
 
 - Switch the branch to ```branch-name```
