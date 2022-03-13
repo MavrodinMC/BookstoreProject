@@ -4,13 +4,13 @@
 This repository deals with the backend side of things in terms of user-side functionalities.
 Admin-side functionalities will be addressed in a separate project/repository.
 
-# ---- Short Description ----
+# Short Description 
 
 I have made this project using Java along with the Spring Framework and with the help of a few other dependencies, like JPA, Hibernate, Security, Spring Mail, Lombok.
 The project is also making use of REST architectural style. 
 As a relational database management system I am using MySQL. 
 
-# ---- Functionalities and structure ----
+# Functionalities and structure 
 
 The project is structured in packages - each package having an unique purpose, like: Entities package, Services package etc
 The project follows the MVC pattern.
