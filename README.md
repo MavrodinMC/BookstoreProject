@@ -1,5 +1,5 @@
 
-# An ecommerce Bookstore Application.
+# Ecommerce Bookstore Application.
 
 This repository deals with the backend side of things in terms of user-side functionalities.
 Admin-side functionalities will be addressed in a separate project/repository.
