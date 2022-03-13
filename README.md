@@ -1,4 +1,4 @@
-# BookstoreProjectBackend
+
 # An ecommerce Bookstore Application.
 
 This repository deals with the backend side of things in terms of user-side functionalities.
